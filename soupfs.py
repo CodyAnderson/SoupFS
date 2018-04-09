@@ -43,12 +43,12 @@ class SoupFS():
     with open(os.path.join(self.config['sources'][0][1],'dirents',str(uuid)),'w') as f:
       return json.dump(dir,f,sort_keys=True, indent=4, separators=(',', ': '))
   def writeblock(self,uuid,block,offset,contents):
-    with open(os.path.join(self.config['sources'][0][1],'blocks',"%s.%8d.block"%(str(uuid),block)),'wb') as f:
+    with open(os.path.join(self.config['sources'][0][1],'blocks',"%s.%08d.block"%(str(uuid),block)),'wb') as f:
       if contents is not None:
         f.seek(offset)
         f.write(contents)
   def readblock(self,uuid,block,offset,length):
-    with open(os.path.join(self.config['sources'][0][1],'blocks',"%s.%8d.block"%(str(uuid),block)),'rb') as f:
+    with open(os.path.join(self.config['sources'][0][1],'blocks',"%s.%08d.block"%(str(uuid),block)),'rb') as f:
       f.seek(offset)
       return f.read(length)
   def getudir(self,uuid):
@@ -86,6 +86,8 @@ class SoupFS():
     return [v['name'] for k,v in self.getdir(path)['children'].items()]
   def mkdir(self,path,mode):
     pd=self.getparentdir(path)
+    if pathsplit(path)[1].upper() in pd['children']:
+      return
     attrs={"st_ctime": time.time(), "st_mtime": time.time(), "st_nlink": 0, "st_gid": 0, "st_size": 4096, "st_atime": time.time(), "st_uid": 0, "st_mode": 040777}
     uuid=uuid4()
     print uuid

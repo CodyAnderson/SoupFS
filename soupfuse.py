@@ -83,8 +83,9 @@ class SoupFuse(Operations):
 
     def statfs(self, path):
         print "Statfs",path
-        stats={'f_blocks':2**38,'f_bfree':2**38,'f_bavail':2**38,'f_bsize':2**12,'f_frsize':2**12}
-        return stats
+        #stats={'f_blocks':2**12,'f_bfree':2**12,'f_frsize':2**12}
+        #return stats
+        return dict(f_bsize=51200, f_blocks=409600, f_bavail=204800, f_bfree=204800, f_frsize=204800)
 
         '''uint64_t f_bsize;
     uint64_t f_frsize;
@@ -141,13 +142,13 @@ class SoupFuse(Operations):
         #return os.open(full_path, os.O_WRONLY | os.O_CREAT, mode)
     
     def read(self, path, length, offset, fh):
-        print "Read",path,length,offset,fh
+        #print "Read",path,length,offset,fh
         return self.soup.read(path,length,offset)
         #os.lseek(fh, offset, os.SEEK_SET)
         #return os.read(fh, length)
     
     def write(self, path, buf, offset, fh):
-        print "Write",path,'[%x] %x'%(len(buf),offset)
+        #print "Write",path,'[%x] %x'%(len(buf),offset)
         return self.soup.write(path,buf,offset)
         #os.lseek(fh, offset, os.SEEK_SET)
         #return os.write(fh, buf)
