@@ -4,7 +4,7 @@ import json
 import time
 import platform
 from uuid import UUID,uuid4
-
+from soupdist import SoupDist
 '''def sid2uid(value):
     sidrx = re.compile('^S-1-5-\d{2}-\d+-(\d{4,10})-\d+-(\d+)$')
     m = sidrx.match(value)
@@ -35,22 +35,16 @@ class SoupFS():
   def __init__(self,config):
     with open(config,'r') as f:
         self.config=json.load(f)
+    self.dist=SoupDist(self.config)
     self.dircache={}
   def loaddir(self,uuid):
-    with open(os.path.join(self.config['sources'][0][1],'dirents',str(uuid)),'r') as f:
-      return json.load(f)
+    return self.dist.loaddir(uuid)
   def savedir(self,uuid,dir):
-    with open(os.path.join(self.config['sources'][0][1],'dirents',str(uuid)),'w') as f:
-      return json.dump(dir,f,sort_keys=True, indent=4, separators=(',', ': '))
+    self.dist.savedir(uuid,dir)
   def writeblock(self,uuid,block,offset,contents):
-    with open(os.path.join(self.config['sources'][0][1],'blocks',"%s.%08d.block"%(str(uuid),block)),'wb') as f:
-      if contents is not None:
-        f.seek(offset)
-        f.write(contents)
+    self.dist.writeblock(uuid,block,offset,contents)
   def readblock(self,uuid,block,offset,length):
-    with open(os.path.join(self.config['sources'][0][1],'blocks',"%s.%08d.block"%(str(uuid),block)),'rb') as f:
-      f.seek(offset)
-      return f.read(length)
+    return self.dist.readblock(uuid,block,offset,length)
   def getudir(self,uuid):
     if uuid not in self.dircache:
       self.dircache[uuid]=self.loaddir(uuid)
